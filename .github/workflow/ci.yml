@@ -1,0 +1,21 @@
+name: Automated CI Pipeline
+on:
+  push:         { branches: [ main ] }
+  pull_request: { branches: [ main ] }
+  workflow_dispatch:
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: node --test
+  package-job:
+    needs: test-job
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Verified build commit ${{ github.sha }}" > build-info.txt
+      - uses: actions/upload-artifact@v4
+        with: { name: verified-build, path: build-info.txt }
